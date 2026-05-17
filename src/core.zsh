@@ -459,8 +459,8 @@ function _zac.immediate() {
 
 function _zac.precmd() {
   # precmd hook: runs right before the prompt is shown.
-  # Used to perform deferred sync work and to perform one-time propagation
-  # after the initial defer window.
+  # Used to perform deferred sync work and pending propagation after the initial
+  # defer window.
 
   # The immediate callback is due since _zac.init: run it once.
   if (( _zac[state.needs_immediate] )); then
@@ -472,10 +472,8 @@ function _zac.precmd() {
   if (( _zac[state.defer_propagate] )); then
     _zac.debug.log "core | precmd | first prompt"
     _zac[state.defer_propagate]=0
-    # First prompt is our "safe point": other prompt plugins/themes have
-    # typically finished their startup work, so we can propagate without
-    # immediately being overwritten.
-    _zac[state.needs_propagate]=1
+    # First prompt is our "safe point": pending propagation can now run, but
+    # reaching the first prompt alone must not call user callbacks.
   fi
 
   if (( _zac[state.needs_sync] )); then
